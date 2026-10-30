@@ -28,7 +28,7 @@ export function SearchBar() {
 
   function go(e: React.FormEvent) {
     e.preventDefault();
-    const b = BUDGET_PRESETS[Number(budget)];
+    const b = BUDGET_PRESETS[Number(budget)] ?? BUDGET_PRESETS[0]!;
     navigate({
       to: "/properties",
       search: {

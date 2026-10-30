@@ -75,7 +75,7 @@ export function LeafletMap({
       pts.push([m.lat, m.lng]);
     });
     if (pts.length > 1) map.fitBounds(pts, { padding: [30, 30] });
-    else if (pts.length === 1) map.setView(pts[0], 14);
+    else if (pts[0]) map.setView(pts[0], 14);
 
     if (onPinChange !== undefined || pin) {
       if (pin) {

@@ -42,10 +42,10 @@ export function LeadForm({
   submitLabel,
 }: {
   kind: Kind;
-  propertyId?: string;
-  defaultMessage?: string;
-  onDone?: () => void;
-  submitLabel?: string;
+  propertyId?: string | undefined;
+  defaultMessage?: string | undefined;
+  onDone?: (() => void) | undefined;
+  submitLabel?: string | undefined;
 }) {
   const [form, setForm] = useState({ name: "", phone: "", email: "", message: "", website: "" });
   const [busy, setBusy] = useState(false);
@@ -56,7 +56,7 @@ export function LeadForm({
     e.preventDefault();
     if (form.website) return; // honeypot
     const parsed = leadSchema.safeParse(form);
-    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
+    if (!parsed.success) { toast.error(parsed.error.issues[0]?.message ?? "Please check the form"); return; }
     setBusy(true);
     const { error } = await supabase.from("enquiries").insert({
       kind,
@@ -67,7 +67,7 @@ export function LeadForm({
       message: parsed.data.message || defaultMessage || null,
     });
     setBusy(false);
-    if (error) return toast.error(friendlyError(error.message));
+    if (error) { toast.error(friendlyError(error.message)); return; }
     toast.success(kind === "interest" ? "Thank you! We'll get back to you shortly." : "Enquiry sent. Our team will contact you soon.");
     setForm({ name: "", phone: "", email: "", message: "", website: "" });
     onDone?.();
@@ -136,8 +136,8 @@ export function VisitDialog({ propertyId, trigger }: { propertyId: string; trigg
   async function submit(e: React.FormEvent) {
     e.preventDefault();
     const parsed = visitSchema.safeParse(f);
-    if (!parsed.success) return toast.error(parsed.error.issues[0].message);
-    if (parsed.data.date < today) return toast.error("Please choose a future date");
+    if (!parsed.success) { toast.error(parsed.error.issues[0]?.message ?? "Please check the form"); return; }
+    if (parsed.data.date < today) { toast.error("Please choose a future date"); return; }
     setBusy(true);
     const { error } = await supabase.from("site_visits").insert({
       property_id: propertyId,
@@ -149,7 +149,7 @@ export function VisitDialog({ propertyId, trigger }: { propertyId: string; trigg
       requested_time: parsed.data.time,
     });
     setBusy(false);
-    if (error) return toast.error(friendlyError(error.message));
+    if (error) { toast.error(friendlyError(error.message)); return; }
     toast.success("Visit requested. We'll call you to confirm the time.");
     setOpen(false);
     setF({ name: "", phone: "", email: "", message: "", date: "", time: "" });

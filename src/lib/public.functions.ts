@@ -67,7 +67,7 @@ async function withSignedPhotos(
   firstOnly = false,
 ): Promise<PublicProperty[]> {
   const paths = Array.from(
-    new Set(rows.flatMap((r) => ((r.photos as string[]) ?? []).slice(0, firstOnly ? 1 : undefined))),
+    new Set(rows.flatMap((r) => ((r["photos"] as string[]) ?? []).slice(0, firstOnly ? 1 : undefined))),
   );
   const map = new Map<string, string>();
   if (paths.length) {
@@ -76,8 +76,8 @@ async function withSignedPhotos(
   }
   return rows.map((r) => ({
     ...(r as unknown as PublicProperty),
-    landmarks: Array.isArray(r.landmarks) ? (r.landmarks as PublicProperty["landmarks"]) : [],
-    photo_urls: ((r.photos as string[]) ?? []).map((p) => map.get(p)).filter(Boolean) as string[],
+    landmarks: Array.isArray(r["landmarks"]) ? (r["landmarks"] as PublicProperty["landmarks"]) : [],
+    photo_urls: ((r["photos"] as string[]) ?? []).map((p) => map.get(p)).filter(Boolean) as string[],
   }));
 }
 
@@ -153,6 +153,7 @@ export const getPublicProperty = createServerFn({ method: "GET" })
       .maybeSingle();
     if (!row) return { property: null, similar: [] as PublicProperty[] };
     const [property] = await withSignedPhotos(sb, [row as Record<string, unknown>]);
+    if (!property) return { property: null, similar: [] as PublicProperty[] };
     const { data: sim } = await sb
       .from("properties")
       .select(PUBLIC_COLS)

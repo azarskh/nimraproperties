@@ -40,7 +40,7 @@ function Index() {
   const [tab, setTab] = useState(0);
   const { data, isLoading } = useQuery({
     queryKey: ["home-properties", tab],
-    queryFn: () => listPublicProperties({ data: { ...TABS[tab].f, pageSize: 8, featuredFirst: true } }),
+    queryFn: () => listPublicProperties({ data: { ...TABS[tab]?.f, pageSize: 8, featuredFirst: true } }),
   });
 
   return (
